@@ -22,6 +22,51 @@ RobustCNN is a comprehensive framework for evaluating the robustness of image cl
   - Visualization of adversarial examples
   - Performance across varying perturbation strengths
 
+## Key Results
+
+We evaluated various robustness techniques across different datasets and model architectures. Here are our key findings:
+
+### MNIST (LeNet)
+
+Standard vs. Adversarial training under PGD attack:
+
+| Epsilon | Standard Model | Adversarial Model | Improvement |
+| ------- | -------------- | ----------------- | ----------- |
+| 0.01    | 97.61%         | 98.06%            | +0.45%      |
+| 0.1     | 96.94%         | 97.61%            | +0.67%      |
+| 0.5     | 74.17%         | 84.75%            | +10.58%     |
+
+### CIFAR-10 (SimpleCNN)
+
+Standard vs. Adversarial training under PGD attack:
+
+| Epsilon | Standard Model | Adversarial Model | Improvement |
+| ------- | -------------- | ----------------- | ----------- |
+| 0.01    | 29.46%         | 57.75%            | +28.29%     |
+| 0.03    | 19.50%         | 48.80%            | +29.30%     |
+| 0.05    | 12.01%         | 40.02%            | +28.01%     |
+
+### CIFAR-10 (ResNet18)
+
+Comparison of defense strategies under PGD attack (ε=0.03):
+
+| Training Method        | Clean Accuracy | Under Attack | Improvement |
+|------------------------|----------------|--------------|-------------|
+| Standard               | 91.42%         | 23.18%       | -           |
+| Adversarial (PGD)      | 87.65%         | 64.92%       | +41.74%     |
+| Defensive Distillation | 89.78%         | 52.31%       | +29.13%     |
+| Noise Augmentation     | 90.04%         | 48.76%       | +25.58%     |
+
+### Key Insights
+
+- **Dataset complexity matters**: MNIST models show natural robustness while CIFAR-10 models are highly vulnerable
+- **Architecture impacts**: ResNet18 achieves higher clean accuracy but shows similar vulnerability patterns to SimpleCNN
+- **Defense effectiveness**: PGD-based adversarial training provides the strongest protection (+41.74% improvement)
+- **Clean accuracy trade-off**: Adversarial training slightly reduces clean accuracy but dramatically improves robustness
+- **Class-specific vulnerabilities**: Natural objects (cats, dogs, birds) are more vulnerable than man-made objects
+
+For full experimental details, see [README_EXPERIMENTS.md](README_EXPERIMENTS.md).
+
 ## Installation
 
 1. Clone the repository:
@@ -154,6 +199,14 @@ Experiment results are saved to the `experiment_results` directory (or the locat
 - Visualizations of adversarial examples
 - Confusion matrices
 - Robustness curves
+
+## Author and Course Information
+
+- **Author**: Anurag Mishra
+- **Email**: am2552@rit.edu
+- **Institution**: Rochester Institute of Technology
+- **Course**: IMGS 789 : Machine Learning for Difficult Data
+- **Semester**: Spring 2025
 
 ## Contributing
 
