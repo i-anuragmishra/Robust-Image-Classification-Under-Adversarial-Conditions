@@ -1,0 +1,67 @@
+{
+  "clean_accuracy": 98.18,
+  "attack_results": {
+    "fgsm": 97.45,
+    "pgd": 97.44
+  },
+  "noise_results": {
+    "gaussian": 97.66,
+    "uniform": 97.69,
+    "salt_and_pepper": 98.01
+  },
+  "occlusion_results": {
+    "block_4": 97.36,
+    "block_8": 91.05,
+    "random_blocks_4": 97.45,
+    "random_blocks_8": 90.76,
+    "gaussian_patch_4": 97.42,
+    "gaussian_patch_8": 90.51
+  },
+  "robustness_results": {
+    "clean_accuracy": 98.3,
+    "adversarial": {
+      "fgsm": {
+        "0.01": 97.4,
+        "0.03": 97.1,
+        "0.05": 97.0,
+        "0.1": 96.6
+      },
+      "pgd": {
+        "0.01": 97.4,
+        "0.03": 97.1,
+        "0.05": 97.0,
+        "0.1": 96.6
+      }
+    },
+    "noise": {
+      "gaussian": {
+        "0.01": 97.4,
+        "0.03": 97.6,
+        "0.05": 97.5,
+        "0.1": 97.4
+      },
+      "uniform": {
+        "0.01": 97.6,
+        "0.03": 97.5,
+        "0.05": 97.6,
+        "0.1": 97.5
+      },
+      "salt_and_pepper": {
+        "0.01": 98.7,
+        "0.03": 98.4,
+        "0.05": 98.4,
+        "0.1": 97.9
+      }
+    },
+    "occlusion": {
+      "block_4": 97.7,
+      "block_8": 90.6,
+      "random_blocks_4": 97.8
+    }
+  },
+  "model": "lenet",
+  "dataset": "mnist",
+  "training_mode": "standard",
+  "attack_epsilon": 0.03,
+  "timestamp": "2025-05-01 12:09:13"
+}

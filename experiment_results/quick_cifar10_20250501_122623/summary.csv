@@ -1,0 +1,3 @@
+Training Method,Clean Accuracy,FGSM (ε=0.01),FGSM (ε=0.03),FGSM (ε=0.05),PGD (ε=0.01),PGD (ε=0.03),PGD (ε=0.05)
+Standard,72.75,33.08,28.43,25.06,29.46,19.50,12.01
+Adversarial,69.38,59.72,55.05,50.48,57.75,48.80,40.02

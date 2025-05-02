@@ -1,0 +1,36 @@
+{
+  "mode": "train_and_evaluate",
+  "dataset": "mnist",
+  "data_dir": "./data",
+  "batch_size": 64,
+  "model": "lenet",
+  "model_path": null,
+  "training_mode": "adversarial",
+  "epochs": 3,
+  "lr": 0.001,
+  "weight_decay": 1e-05,
+  "optimizer": "adam",
+  "patience": 10,
+  "attack": "fgsm",
+  "epsilon": 0.1,
+  "attacks": [
+    "fgsm",
+    "pgd"
+  ],
+  "epsilons": [
+    0.01,
+    0.03,
+    0.05,
+    0.1
+  ],
+  "noise_types": [
+    "gaussian",
+    "uniform",
+    "salt_and_pepper"
+  ],
+  "num_examples": 5,
+  "seed": 42,
+  "gpu": 0,
+  "result_dir": "./experiment_results",
+  "experiment_name": "lenet_adv_mnist"
+}

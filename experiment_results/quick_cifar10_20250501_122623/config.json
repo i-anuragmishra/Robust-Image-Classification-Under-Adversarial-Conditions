@@ -1,0 +1,16 @@
+{
+  "model_type": "simple_cnn",
+  "dataset": "cifar10",
+  "attacks": [
+    "fgsm",
+    "pgd"
+  ],
+  "epsilons": [
+    0.01,
+    0.03,
+    0.05
+  ],
+  "epochs": 5,
+  "patience": 2,
+  "timestamp": "2025-05-01 12:26:23"
+}

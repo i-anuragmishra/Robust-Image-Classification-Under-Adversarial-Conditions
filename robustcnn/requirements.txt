@@ -1,0 +1,12 @@
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+scikit-learn>=1.2.0
+pandas>=1.5.0
+jupyter>=1.0.0
+tqdm>=4.64.0
+advertorch>=0.2.3
+tensorboard>=2.12.0
+pillow>=9.4.0
+seaborn>=0.12.0 

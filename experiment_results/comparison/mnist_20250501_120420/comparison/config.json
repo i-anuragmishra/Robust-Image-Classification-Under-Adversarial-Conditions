@@ -1,0 +1,26 @@
+{
+  "dataset": "mnist",
+  "models": [
+    "lenet",
+    "simple_cnn"
+  ],
+  "defenses": [
+    "standard",
+    "adversarial"
+  ],
+  "attacks": [
+    "fgsm",
+    "pgd"
+  ],
+  "epochs": 5,
+  "batch_size": 64,
+  "epsilon": 0.05,
+  "epsilons": [
+    0.01,
+    0.02,
+    0.03,
+    0.05,
+    0.1
+  ],
+  "output_dir": "experiment_results/comparison"
+}
