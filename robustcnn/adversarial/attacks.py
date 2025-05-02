@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-# Fix for compatibility issue with advertorch and newer PyTorch versions
+
 import torch.autograd.gradcheck
 if not hasattr(torch.autograd.gradcheck, 'zero_gradients'):
     def zero_gradients(x):
@@ -15,10 +15,10 @@ if not hasattr(torch.autograd.gradcheck, 'zero_gradients'):
             for elem in x:
                 zero_gradients(elem)
     
-    # Monkey patch the function into torch.autograd.gradcheck
+    
     torch.autograd.gradcheck.zero_gradients = zero_gradients
 
-import collections.abc  # Required for the zero_gradients function
+import collections.abc  
 
 from advertorch.attacks import (
     GradientSignAttack,
@@ -30,29 +30,16 @@ from advertorch.attacks import (
 
 
 class AdversarialAttack:
-    """
-    A wrapper class for adversarial attacks from advertorch
-    """
+    
     def __init__(self, model, attack_type='fgsm', epsilon=0.03, clip_min=0.0, clip_max=1.0, **kwargs):
-        """
-        Initialize the adversarial attack
         
-        Args:
-            model: The model to attack
-            attack_type: The type of attack to use
-                ('fgsm', 'pgd', 'cw', 'jsma')
-            epsilon: The maximum perturbation size
-            clip_min: Minimum value of the input
-            clip_max: Maximum value of the input
-            **kwargs: Additional attack-specific parameters
-        """
         self.model = model
         self.attack_type = attack_type.lower()
         self.epsilon = epsilon
         self.clip_min = clip_min
         self.clip_max = clip_max
         
-        # Create the attack
+        
         if self.attack_type == 'fgsm':
             self.attack = GradientSignAttack(
                 self.model, 
@@ -112,55 +99,26 @@ class AdversarialAttack:
             raise ValueError(f"Attack type {attack_type} not supported")
     
     def generate(self, inputs, labels, targeted_labels=None):
-        """
-        Generate adversarial examples
         
-        Args:
-            inputs: Clean inputs
-            labels: True labels for untargeted attacks, or target labels for targeted attacks
-            targeted_labels: Target labels for targeted attacks
-            
-        Returns:
-            perturbed_inputs: Adversarial examples
-        """
-        # For targeted attacks
+        
         if targeted_labels is not None and self.attack.targeted:
             return self.attack.perturb(inputs, targeted_labels)
         
-        # For untargeted attacks
+        
         return self.attack.perturb(inputs, labels)
 
 
 class NoiseGenerator:
-    """
-    Class for generating different types of noise perturbations
-    """
+    
     def __init__(self, noise_type='gaussian', epsilon=0.03, clip_min=0.0, clip_max=1.0):
-        """
-        Initialize the noise generator
         
-        Args:
-            noise_type: Type of noise to generate
-                ('gaussian', 'uniform', 'salt_and_pepper')
-            epsilon: Magnitude of the noise
-            clip_min: Minimum value of the input
-            clip_max: Maximum value of the input
-        """
         self.noise_type = noise_type.lower()
         self.epsilon = epsilon
         self.clip_min = clip_min
         self.clip_max = clip_max
     
     def generate(self, inputs):
-        """
-        Generate noisy examples
         
-        Args:
-            inputs: Clean inputs
-            
-        Returns:
-            noisy_inputs: Perturbed inputs
-        """
         if self.noise_type == 'gaussian':
             noise = torch.randn_like(inputs) * self.epsilon
             noisy_inputs = inputs + noise
@@ -179,60 +137,41 @@ class NoiseGenerator:
         else:
             raise ValueError(f"Noise type {self.noise_type} not supported")
         
-        # Clip the noisy inputs to the valid range
+        
         noisy_inputs = torch.clamp(noisy_inputs, self.clip_min, self.clip_max)
         
         return noisy_inputs
 
 
 class OcclusionGenerator:
-    """
-    Class for generating occlusion perturbations
-    """
+    
     def __init__(self, occlusion_type='block', occlusion_size=6, occlusion_value=0.0, random_position=True):
-        """
-        Initialize the occlusion generator
         
-        Args:
-            occlusion_type: Type of occlusion to generate
-                ('block', 'random_blocks', 'gaussian_patch')
-            occlusion_size: Size of the occlusion patch
-            occlusion_value: Value to fill in the occluded region
-            random_position: Whether to use random position for the occlusion
-        """
         self.occlusion_type = occlusion_type.lower()
         self.occlusion_size = occlusion_size
         self.occlusion_value = occlusion_value
         self.random_position = random_position
     
     def generate(self, inputs):
-        """
-        Generate occluded examples
         
-        Args:
-            inputs: Clean inputs
-            
-        Returns:
-            occluded_inputs: Inputs with occlusions
-        """
         batch_size, channels, height, width = inputs.shape
         occluded_inputs = inputs.clone()
         
         if self.occlusion_type == 'block':
             for i in range(batch_size):
                 if self.random_position:
-                    # Random position for the occlusion
+                    
                     h_start = np.random.randint(0, height - self.occlusion_size + 1)
                     w_start = np.random.randint(0, width - self.occlusion_size + 1)
                 else:
-                    # Center position for the occlusion
+                    
                     h_start = (height - self.occlusion_size) // 2
                     w_start = (width - self.occlusion_size) // 2
                 
                 occluded_inputs[i, :, h_start:h_start+self.occlusion_size, w_start:w_start+self.occlusion_size] = self.occlusion_value
         
         elif self.occlusion_type == 'random_blocks':
-            # Create multiple smaller blocks
+            
             num_blocks = 5
             block_size = self.occlusion_size // 2
             
@@ -243,7 +182,7 @@ class OcclusionGenerator:
                     occluded_inputs[i, :, h_start:h_start+block_size, w_start:w_start+block_size] = self.occlusion_value
         
         elif self.occlusion_type == 'gaussian_patch':
-            # Create a Gaussian patch for smoother occlusion
+            
             x = np.linspace(-1, 1, self.occlusion_size)
             y = np.linspace(-1, 1, self.occlusion_size)
             x_grid, y_grid = np.meshgrid(x, y)

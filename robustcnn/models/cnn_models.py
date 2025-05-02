@@ -5,9 +5,7 @@ import torchvision.models as models
 
 
 class SimpleCNN(nn.Module):
-    """
-    A simple CNN for image classification with basic architecture
-    """
+    
     def __init__(self, in_channels=3, num_classes=10):
         super(SimpleCNN, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 32, kernel_size=3, padding=1)
@@ -33,9 +31,7 @@ class SimpleCNN(nn.Module):
 
 
 class LeNet(nn.Module):
-    """
-    LeNet architecture for MNIST
-    """
+    
     def __init__(self, in_channels=1, num_classes=10):
         super(LeNet, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 6, kernel_size=5)
@@ -57,13 +53,11 @@ class LeNet(nn.Module):
 
 
 class ResNetModel(nn.Module):
-    """
-    ResNet model with adjustable depth for image classification
-    """
+    
     def __init__(self, model_type='resnet18', in_channels=3, num_classes=10, pretrained=False):
         super(ResNetModel, self).__init__()
         
-        # Dictionary to map model type to model constructor
+        
         model_dict = {
             'resnet18': models.resnet18,
             'resnet34': models.resnet34,
@@ -73,17 +67,17 @@ class ResNetModel(nn.Module):
         if model_type not in model_dict:
             raise ValueError(f"Model type {model_type} not supported. Choose from {list(model_dict.keys())}")
         
-        # Initialize the model
+        
         if pretrained:
             self.model = model_dict[model_type](weights='IMAGENET1K_V1')
         else:
             self.model = model_dict[model_type](weights=None)
         
-        # Modify first conv layer if input channels don't match
+        
         if in_channels != 3:
             self.model.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
         
-        # Replace final fully connected layer
+        
         in_features = self.model.fc.in_features
         self.model.fc = nn.Linear(in_features, num_classes)
         
@@ -92,13 +86,11 @@ class ResNetModel(nn.Module):
 
 
 class VGGModel(nn.Module):
-    """
-    VGG model with adjustable depth for image classification
-    """
+    
     def __init__(self, model_type='vgg11', in_channels=3, num_classes=10, pretrained=False):
         super(VGGModel, self).__init__()
         
-        # Dictionary to map model type to model constructor
+        
         model_dict = {
             'vgg11': models.vgg11,
             'vgg13': models.vgg13,
@@ -109,18 +101,18 @@ class VGGModel(nn.Module):
         if model_type not in model_dict:
             raise ValueError(f"Model type {model_type} not supported. Choose from {list(model_dict.keys())}")
         
-        # Initialize the model
+        
         if pretrained:
             self.model = model_dict[model_type](weights='IMAGENET1K_V1')
         else:
             self.model = model_dict[model_type](weights=None)
         
-        # Modify first conv layer if input channels don't match
+        
         if in_channels != 3:
             first_conv_layer = nn.Conv2d(in_channels, 64, kernel_size=3, padding=1)
             self.model.features[0] = first_conv_layer
         
-        # Replace final classifier layer
+        
         in_features = self.model.classifier[-1].in_features
         self.model.classifier[-1] = nn.Linear(in_features, num_classes)
         
@@ -129,17 +121,7 @@ class VGGModel(nn.Module):
 
 
 def get_model(model_name, dataset_info):
-    """
-    Factory function to get a model instance
     
-    Args:
-        model_name: Name of the model to instantiate
-        dataset_info: Dictionary containing dataset information
-            (input_channels, num_classes)
-            
-    Returns:
-        model: Instantiated model
-    """
     in_channels = dataset_info['input_channels']
     num_classes = dataset_info['num_classes']
     

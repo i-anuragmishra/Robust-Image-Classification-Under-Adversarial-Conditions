@@ -12,7 +12,7 @@ from utils import evaluate_model, evaluate_under_attack, evaluate_under_noise, p
 
 
 def set_seed(seed):
-    """Set random seed for reproducibility"""
+    
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
@@ -21,10 +21,10 @@ def set_seed(seed):
 
 
 def parse_args():
-    """Parse command line arguments"""
+    
     parser = argparse.ArgumentParser(description='Train a robust image classifier')
     
-    # Dataset parameters
+    
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'mnist'],
                        help='Dataset to use')
     parser.add_argument('--data_dir', type=str, default='./data',
@@ -32,12 +32,12 @@ def parse_args():
     parser.add_argument('--batch_size', type=int, default=128,
                        help='Batch size for training and evaluation')
     
-    # Model parameters
+    
     parser.add_argument('--model', type=str, default='resnet18',
                        choices=['simple_cnn', 'lenet', 'resnet18', 'resnet34', 'resnet50', 'vgg11', 'vgg13', 'vgg16'],
                        help='Model architecture to use')
     
-    # Training parameters
+    
     parser.add_argument('--training_mode', type=str, default='standard',
                        choices=['standard', 'adversarial', 'distillation', 'noise_augmentation'],
                        help='Training mode to use')
@@ -52,19 +52,19 @@ def parse_args():
     parser.add_argument('--patience', type=int, default=10,
                        help='Patience for early stopping')
     
-    # Adversarial training parameters
+    
     parser.add_argument('--attack', type=str, default='fgsm',
                        choices=['fgsm', 'pgd', 'linf-pgd'],
                        help='Adversarial attack type for training')
     parser.add_argument('--epsilon', type=float, default=0.03,
                        help='Epsilon parameter for adversarial training')
     
-    # Noise augmentation parameters
+    
     parser.add_argument('--noise_type', type=str, default='gaussian',
                        choices=['gaussian', 'uniform', 'salt_and_pepper'],
                        help='Noise type for augmentation')
     
-    # Miscellaneous parameters
+    
     parser.add_argument('--seed', type=int, default=42,
                        help='Random seed for reproducibility')
     parser.add_argument('--gpu', type=int, default=0,
@@ -76,22 +76,22 @@ def parse_args():
 
 
 def main():
-    """Main function"""
-    # Parse arguments
+    
+    
     args = parse_args()
     
-    # Set random seed
+    
     set_seed(args.seed)
     
-    # Create save directory
+    
     save_dir = os.path.join(args.save_dir, f"{args.dataset}_{args.model}_{args.training_mode}")
     os.makedirs(save_dir, exist_ok=True)
     
-    # Set device
+    
     device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
-    # Load dataset
+    
     print(f"Loading {args.dataset} dataset...")
     data_loader = DatasetLoader(
         dataset_name=args.dataset,
@@ -101,12 +101,12 @@ def main():
     train_loader, val_loader, test_loader = data_loader.get_loaders()
     dataset_info = data_loader.get_dataset_info()
     
-    # Create model
+    
     print(f"Creating {args.model} model...")
     model = get_model(args.model, dataset_info)
     model = model.to(device)
     
-    # Create trainer based on training mode
+    
     print(f"Training with {args.training_mode} mode...")
     trainer_kwargs = {
         'learning_rate': args.lr,
@@ -134,27 +134,27 @@ def main():
         **trainer_kwargs
     )
     
-    # Create learning rate scheduler
+    
     scheduler = ReduceLROnPlateau(trainer.optimizer, mode='min', factor=0.5, patience=5, verbose=True)
     
-    # Train the model
+    
     history = trainer.train(
         num_epochs=args.epochs,
         early_stopping_patience=args.patience,
         scheduler=scheduler
     )
     
-    # Save the trained model
+    
     model_path = os.path.join(save_dir, 'model.pth')
     torch.save(model.state_dict(), model_path)
     print(f"Model saved to {model_path}")
     
-    # Save training history
+    
     history_path = os.path.join(save_dir, 'history.json')
     with open(history_path, 'w') as f:
         json.dump(history, f)
     
-    # Plot training curves
+    
     plt.figure(figsize=(12, 5))
     
     plt.subplot(1, 2, 1)
@@ -178,12 +178,12 @@ def main():
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, 'training_curves.png'))
     
-    # Evaluate on test set
+    
     print("\nEvaluating on test set...")
     test_acc, test_preds, test_targets = evaluate_model(model, test_loader, device)
     print(f"Test accuracy: {test_acc:.2f}%")
     
-    # Plot confusion matrix
+    
     class_names = [str(i) for i in range(dataset_info['num_classes'])]
     plot_confusion_matrix(
         test_targets, 
@@ -192,29 +192,29 @@ def main():
         save_path=os.path.join(save_dir, 'confusion_matrix.png')
     )
     
-    # Evaluate robustness (if using robust training methods)
+    
     if args.training_mode in ['adversarial', 'distillation', 'noise_augmentation']:
         print("\nEvaluating robustness...")
         
-        # Test under FGSM attack
+        
         fgsm_acc, clean_acc, fgsm_preds, _ = evaluate_under_attack(
             model, test_loader, device, 'fgsm', args.epsilon
         )
         print(f"Accuracy under FGSM attack (ε={args.epsilon}): {fgsm_acc:.2f}%")
         
-        # Test under PGD attack
+        
         pgd_acc, _, pgd_preds, _ = evaluate_under_attack(
             model, test_loader, device, 'pgd', args.epsilon
         )
         print(f"Accuracy under PGD attack (ε={args.epsilon}): {pgd_acc:.2f}%")
         
-        # Test under Gaussian noise
+        
         noise_acc, _, noise_preds, _ = evaluate_under_noise(
             model, test_loader, device, 'gaussian', args.epsilon
         )
         print(f"Accuracy under Gaussian noise (ε={args.epsilon}): {noise_acc:.2f}%")
         
-        # Save robustness results
+        
         robustness_results = {
             'clean_accuracy': clean_acc,
             'fgsm_accuracy': fgsm_acc,
